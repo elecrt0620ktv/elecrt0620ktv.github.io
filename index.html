@@ -107,10 +107,41 @@
     function setDisabled(v){document.querySelectorAll('.choice,.knob').forEach(b=>b.disabled=v)}
     function confetti(){const colors=['#ff6fa9','#6ed3ff','#ffd45f','#7be0b9','#9e8bff'];for(let i=0;i<55;i++){const p=document.createElement('i');p.className='confetti';p.style.left=Math.random()*100+'vw';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=(1.7+Math.random()*1.9)+'s';p.style.animationDelay=Math.random()*.35+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),4000)}}
 
-    function showResult(type,item){$('resultEmpty').style.display='none';const c=$('resultContent');c.classList.remove('show');void c.offsetWidth;$('resultType').textContent=type==='singer'?'抽到歌手':'抽到歌曲';$('resultMain').textContent=type==='singer'?item.singer:item.song;$('resultSub').textContent=type==='singer'?'看看要唱他的哪一首！':item.singer;c.classList.add('show')}
+    function showResult(type,item){$('resultEmpty').style.display='none';const c=$('resultContent');c.style.display='block';c.classList.remove('show');void c.offsetWidth;$('resultType').textContent=type==='singer'?'抽到歌手':'抽到歌曲';$('resultMain').textContent=type==='singer'?item.singer:item.song;$('resultSub').textContent=type==='singer'?'看看要唱他的哪一首！':item.singer;c.classList.add('show')}
 
-    async function draw(){if(state.drawing)return;const type=randomType();if(!type){toast('全部都抽過了，請刪除紀錄或清除紀錄');return}const item=pick(type);if(!item){toast('目前沒有可抽的資料');return}state.drawing=true;setDisabled(true);$('resultContent').classList.remove('show');$('resultEmpty').style.display='block';$('resultEmpty').innerHTML='<div style="font-size:46px">🎲</div><strong>命運選擇中…</strong>';
-      const machine=$('machine'),dome=$('dome'),capsule=$('capsule');machine.classList.add('shake');dome.classList.add('spin');const pool=type==='singer'?getSingerPool():getSongPool();
+    async function draw(){
+      if(state.drawing)return;
+
+      const type=randomType();
+      if(!type){toast('全部都抽過了，請刪除紀錄或清除紀錄');return}
+
+      const item=pick(type);
+      if(!item){toast('目前沒有可抽的資料');return}
+
+      state.drawing=true;
+      setDisabled(true);
+
+      const machine=$('machine');
+      const dome=$('dome');
+      const capsule=$('capsule');
+      const resultContent=$('resultContent');
+      const resultEmpty=$('resultEmpty');
+
+      // 第二次抽籤時，先把上一顆扭蛋與結果收起來。
+      capsule.classList.remove('drop');
+      resultContent.classList.remove('show');
+      resultContent.style.display='none';
+      resultEmpty.style.display='none';
+
+      // 等畫面完成重置後，再開始下一次動畫。
+      await sleep(180);
+
+      resultEmpty.style.display='block';
+      resultEmpty.innerHTML='<div style="font-size:46px">🎲</div><strong>命運選擇中…</strong>';
+
+      machine.classList.add('shake');
+      dome.classList.add('spin');
+      const pool=type==='singer'?getSingerPool():getSongPool();
       for(let i=0;i<12;i++){const p=pool[Math.floor(Math.random()*pool.length)]||item;$('status').textContent=type==='singer'?p.singer:`${p.singer}｜${p.song}`;await sleep(85+i*18)}
       machine.classList.remove('shake');dome.classList.remove('spin');capsule.classList.remove('drop');void capsule.offsetWidth;capsule.classList.add('drop');$('status').textContent='扭蛋掉出來了！';await sleep(900);
       showResult(type,item);state.history.push({type,id:item.id,singer:item.singer,song:item.song,time:Date.now()});state.history=state.history.slice(-20);saveHistory();confetti();$('status').textContent=type==='singer'?`抽中歌手：${item.singer}`:`抽中歌曲：${item.song}`;state.drawing=false;setDisabled(false)}
