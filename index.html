@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff77ad" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>K歌扭蛋機</title>
+  <style>
+    :root{--pink:#ff77ad;--pink2:#f14e91;--blue:#75d5ff;--yellow:#ffd966;--ink:#4f4055;--card:rgba(255,255,255,.9);--shadow:0 16px 40px rgba(113,62,98,.17)}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--ink)}
+    body{background:radial-gradient(circle at 10% 8%,#fff 0,transparent 20%),linear-gradient(155deg,#ffe1ee 0%,#e8f8ff 52%,#fff2c8 100%);overflow-x:hidden}
+    button{font:inherit;border:0;cursor:pointer;touch-action:manipulation}
+    button:active{transform:scale(.97)} button:disabled{opacity:.55}
+    .app{width:min(100%,520px);margin:auto;padding:max(16px,env(safe-area-inset-top)) 14px max(32px,env(safe-area-inset-bottom))}
+    header{text-align:center;margin:4px 0 14px} h1{font-size:clamp(30px,9vw,44px);margin:0;text-shadow:0 3px #fff}.subtitle{font-size:14px;opacity:.72;margin-top:4px}
+    .panel{background:var(--card);border:3px solid rgba(255,255,255,.78);border-radius:26px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+    .machine-card{padding:14px 12px 16px}
+    .machine-wrap{height:min(86vw,420px);min-height:330px;display:grid;place-items:center;position:relative}
+    .machine{width:min(94%,400px);aspect-ratio:1/1.1;position:relative;filter:drop-shadow(0 18px 24px rgba(91,72,118,.2));transform-origin:center bottom}
+    .sign{position:absolute;left:13%;right:13%;top:1%;z-index:4;background:linear-gradient(#ff6ea7,#ff91bd);border:7px solid #d8447d;color:#fff;text-align:center;padding:9px 4px;border-radius:26px 26px 16px 16px;font-size:clamp(20px,6vw,29px);font-weight:1000;letter-spacing:3px;text-shadow:0 3px #c52d6b}.sign:before,.sign:after{content:"★";color:var(--yellow);margin:0 7px}
+    .dome{position:absolute;left:16%;right:16%;top:15%;height:43%;z-index:2;border:9px solid #68bfe8;border-radius:48% 48% 38% 38%;background:linear-gradient(150deg,rgba(255,255,255,.94),rgba(214,244,255,.64));overflow:hidden;box-shadow:inset 0 0 0 6px rgba(255,255,255,.7)}
+    .balls{position:absolute;inset:12% 7% 4%}.ball{position:absolute;width:clamp(46px,14vw,62px);aspect-ratio:1;border-radius:50%;border:5px solid rgba(255,255,255,.72);box-shadow:inset -7px -9px rgba(0,0,0,.08),0 7px 11px rgba(0,0,0,.11)}
+    .ball:nth-child(1){left:7%;bottom:4%;background:#78d9ff}.ball:nth-child(2){left:28%;bottom:13%;background:#ff7da9}.ball:nth-child(3){left:48%;bottom:3%;background:#ffd45f}.ball:nth-child(4){left:68%;bottom:16%;background:#79e0bd}.ball:nth-child(5){left:14%;bottom:36%;background:#ffd45f}.ball:nth-child(6){left:44%;bottom:37%;background:#8d8bff}.ball:nth-child(7){left:68%;bottom:39%;background:#ff7da9}
+    .base{position:absolute;left:8%;right:8%;bottom:4%;height:43%;z-index:1;border-radius:34px 34px 48px 48px;background:linear-gradient(#ff8fbb,#ff6ca6);border:8px solid #d7427c}.base:before{content:"";position:absolute;left:-8%;right:-8%;bottom:-9%;height:18%;border-radius:22px;background:#6cc9ee;border:6px solid #4aa8d0}
+    .speaker{position:absolute;bottom:18%;width:16%;height:31%;z-index:3;background:#5b6072;border:5px solid #404556;border-radius:15px}.speaker.left{left:2%}.speaker.right{right:2%}.speaker:before,.speaker:after{content:"";position:absolute;left:18%;right:18%;height:28%;border-radius:50%;background:#2e3342;border:4px solid #747b90}.speaker:before{top:10%}.speaker:after{bottom:10%}
+    .slot{position:absolute;left:20%;bottom:14%;width:34%;height:22%;z-index:4;background:#fff1f6;border:6px solid #d7437e;border-radius:17px}.slot:before{content:"";position:absolute;left:14%;right:14%;top:22%;height:30%;background:#9c2b56;border-radius:9px}
+    .knob{position:absolute;right:16%;bottom:20%;width:21%;aspect-ratio:1;z-index:5;background:#ffd85e;border:7px solid #e5a62f;border-radius:50%;display:grid;place-items:center}.knob:after{content:"";width:35%;height:72%;background:#ff8cb8;border:4px solid #d8437d;border-radius:16px}
+    .capsule{position:absolute;left:34%;bottom:8%;width:31%;aspect-ratio:1.1;z-index:8;border-radius:50%;background:linear-gradient(#ffd663 50%,#ff82ad 50%);border:7px solid rgba(255,255,255,.87);box-shadow:0 15px 24px rgba(93,45,74,.24);opacity:0;transform:translateY(-150px) scale(.5)}
+    .status{min-height:52px;padding:4px 8px;display:grid;place-items:center;text-align:center;font-size:17px;font-weight:900}
+    .choices{margin-top:8px}.choice{width:100%;min-height:68px;border-radius:20px;color:#fff;font-size:21px;font-weight:1000;box-shadow:0 7px 0 rgba(0,0,0,.14);background:linear-gradient(180deg,#ff91bd,#ef4f90)}
+    .result{margin-top:14px;padding:18px;text-align:center;min-height:170px;display:grid;place-items:center;overflow:hidden}.result-empty{opacity:.55}.result-content{display:none;width:100%}.result-content.show{display:block;animation:reveal .55s cubic-bezier(.2,.9,.2,1.3)}.result-type{display:inline-block;padding:6px 12px;border-radius:999px;background:#fff2b8;color:#8c6700;font-size:13px;font-weight:900}.result-main{font-size:clamp(32px,10vw,48px);font-weight:1000;margin-top:10px;color:var(--pink2);text-shadow:0 3px #fff;line-height:1.15}.result-sub{font-size:18px;font-weight:900;margin-top:8px;opacity:.72}
+    .bottom-row{display:flex;justify-content:space-between;align-items:center;margin:14px 2px 8px}.bottom-row h2{font-size:18px;margin:0}.text-btn{background:rgba(255,255,255,.75);border:2px solid #f2d6e3;border-radius:14px;padding:8px 12px;color:var(--ink);font-weight:900}.history{display:grid;gap:8px}.history-item{background:rgba(255,255,255,.84);border:2px solid rgba(255,255,255,.9);border-radius:16px;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}.history-item small{display:block;margin-top:2px;opacity:.6}.remove{background:#fff0f4;color:#d83b71;border-radius:11px;padding:7px 9px;font-weight:900}.empty-note{text-align:center;opacity:.5;padding:18px}
+    .toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translate(-50%,35px);background:#403748;color:#fff;padding:11px 17px;border-radius:999px;opacity:0;transition:.28s;z-index:99;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .confetti{position:fixed;top:-20px;width:9px;height:16px;border-radius:3px;z-index:80;animation:fall linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+    .shake{animation:shake .12s ease-in-out 18}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px) rotate(-1deg)}75%{transform:translateX(5px) rotate(1deg)}}.spin .ball{animation:mix .34s ease-in-out infinite alternate}.spin .ball:nth-child(even){animation-delay:.08s}.spin .ball:nth-child(3n){animation-delay:.14s}@keyframes mix{to{transform:translateY(-30px) translateX(10px) rotate(20deg)}}.drop{animation:drop 1s cubic-bezier(.15,.8,.25,1.2) forwards}@keyframes drop{0%{opacity:0;transform:translateY(-160px) scale(.55) rotate(-20deg)}70%{opacity:1;transform:translateY(10px) scale(1.05) rotate(8deg)}100%{opacity:1;transform:translateY(0) scale(1)}}@keyframes reveal{from{opacity:0;transform:scale(.5) rotate(-4deg)}to{opacity:1;transform:scale(1)}}
+    @media(min-width:700px){.app{width:min(100%,600px)}.machine-wrap{height:440px}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header><h1>🎤 K歌扭蛋機</h1><div class="subtitle">今天要唱誰？唱哪首？交給命運決定！</div></header>
+
+    <section class="machine-card panel">
+      <div class="machine-wrap">
+        <div class="machine" id="machine">
+          <div class="sign">KTV</div>
+          <div class="dome" id="dome"><div class="balls"><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div><div class="ball"></div></div></div>
+          <div class="base"></div><div class="speaker left"></div><div class="speaker right"></div><div class="slot"></div><button class="knob" id="knob" aria-label="開始抽籤"></button><div class="capsule" id="capsule"></div>
+        </div>
+      </div>
+      <div class="status" id="status">每次隨機抽出「歌手」或「歌曲」</div>
+      <div class="choices">
+        <button class="choice" id="drawBtn">🎲 開始抽籤</button>
+      </div>
+    </section>
+
+    <section class="result panel">
+      <div class="result-empty" id="resultEmpty"><div style="font-size:46px">✨</div><strong>抽籤結果會出現在這裡</strong></div>
+      <div class="result-content" id="resultContent"><div class="result-type" id="resultType"></div><div class="result-main" id="resultMain"></div><div class="result-sub" id="resultSub"></div></div>
+    </section>
+
+    <div class="bottom-row"><h2>最近抽籤</h2><button class="text-btn" id="clearBtn">清除紀錄</button></div>
+    <section class="history" id="history"></section>
+  </main>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Google Apps Script Web App 網址，沒有使用時保持空字串即可。
+    const API_URL = '';
+
+    const demoSongs = [
+      {id:1,singer:'周杰倫',song:'擱淺'},{id:2,singer:'周杰倫',song:'晴天'},{id:3,singer:'五月天',song:'突然好想你'},
+      {id:4,singer:'蔡依林',song:'倒帶'},{id:5,singer:'林俊傑',song:'修煉愛情'},{id:6,singer:'張惠妹',song:'聽海'},
+      {id:7,singer:'陳奕迅',song:'十年'},{id:8,singer:'王心凌',song:'愛你'},{id:9,singer:'S.H.E',song:'戀人未滿'},
+      {id:10,singer:'A-Lin',song:'給我一個理由忘記'},{id:11,singer:'盧廣仲',song:'刻在我心底的名字'}
+    ];
+
+    const $=id=>document.getElementById(id);
+    const state={songs:demoSongs,history:JSON.parse(localStorage.getItem('ktv-mobile-history')||'[]'),drawing:false};
+    const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    const escapeHtml=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+    function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1800)}
+    function normalize(data){const rows=Array.isArray(data)?data:(Array.isArray(data?.data)?data.data:[]);return rows.map((x,i)=>({id:x.id??i,singer:String(x.singer??x.artist??'').trim(),song:String(x.song??x.title??'').trim(),enabled:x.enabled===undefined||!['false','0','no','n'].includes(String(x.enabled).toLowerCase())})).filter(x=>x.enabled&&(x.singer||x.song))}
+    async function loadData(){if(!API_URL)return;try{const r=await fetch(API_URL,{cache:'no-store'});if(!r.ok)throw Error(r.status);const rows=normalize(await r.json());if(rows.length){state.songs=rows;$('status').textContent=`已載入 ${rows.length} 首歌曲`}}catch(e){console.error(e);toast('資料載入失敗，已使用內建資料')}}
+
+    function getSingerPool(){
+      const drawnSingers=new Set(state.history.filter(x=>x.type==='singer').map(x=>x.singer));
+      const map=new Map();
+      state.songs.forEach(x=>{if(x.singer&&!drawnSingers.has(x.singer)&&!map.has(x.singer))map.set(x.singer,x)});
+      return [...map.values()];
+    }
+    function getSongPool(){
+      const drawnSongIds=new Set(state.history.filter(x=>x.type==='song').map(x=>String(x.id)));
+      return state.songs.filter(x=>x.song&&!drawnSongIds.has(String(x.id)));
+    }
+    function randomType(){
+      const available=[];
+      if(getSingerPool().length)available.push('singer');
+      if(getSongPool().length)available.push('song');
+      return available[Math.floor(Math.random()*available.length)];
+    }
+    function pick(type){const pool=type==='singer'?getSingerPool():getSongPool();return pool[Math.floor(Math.random()*pool.length)]}
+
+    function setDisabled(v){document.querySelectorAll('.choice,.knob').forEach(b=>b.disabled=v)}
+    function confetti(){const colors=['#ff6fa9','#6ed3ff','#ffd45f','#7be0b9','#9e8bff'];for(let i=0;i<55;i++){const p=document.createElement('i');p.className='confetti';p.style.left=Math.random()*100+'vw';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=(1.7+Math.random()*1.9)+'s';p.style.animationDelay=Math.random()*.35+'s';document.body.appendChild(p);setTimeout(()=>p.remove(),4000)}}
+
+    function showResult(type,item){$('resultEmpty').style.display='none';const c=$('resultContent');c.classList.remove('show');void c.offsetWidth;$('resultType').textContent=type==='singer'?'抽到歌手':'抽到歌曲';$('resultMain').textContent=type==='singer'?item.singer:item.song;$('resultSub').textContent=type==='singer'?'看看要唱他的哪一首！':item.singer;c.classList.add('show')}
+
+    async function draw(){if(state.drawing)return;const type=randomType();if(!type){toast('全部都抽過了，請刪除紀錄或清除紀錄');return}const item=pick(type);if(!item){toast('目前沒有可抽的資料');return}state.drawing=true;setDisabled(true);$('resultContent').classList.remove('show');$('resultEmpty').style.display='block';$('resultEmpty').innerHTML='<div style="font-size:46px">🎲</div><strong>命運選擇中…</strong>';
+      const machine=$('machine'),dome=$('dome'),capsule=$('capsule');machine.classList.add('shake');dome.classList.add('spin');const pool=type==='singer'?getSingerPool():getSongPool();
+      for(let i=0;i<12;i++){const p=pool[Math.floor(Math.random()*pool.length)]||item;$('status').textContent=type==='singer'?p.singer:`${p.singer}｜${p.song}`;await sleep(85+i*18)}
+      machine.classList.remove('shake');dome.classList.remove('spin');capsule.classList.remove('drop');void capsule.offsetWidth;capsule.classList.add('drop');$('status').textContent='扭蛋掉出來了！';await sleep(900);
+      showResult(type,item);state.history.push({type,id:item.id,singer:item.singer,song:item.song,time:Date.now()});state.history=state.history.slice(-20);saveHistory();confetti();$('status').textContent=type==='singer'?`抽中歌手：${item.singer}`:`抽中歌曲：${item.song}`;state.drawing=false;setDisabled(false)}
+
+    function saveHistory(){localStorage.setItem('ktv-mobile-history',JSON.stringify(state.history));renderHistory()}
+    function renderHistory(){const box=$('history');box.innerHTML='';if(!state.history.length){box.innerHTML='<div class="empty-note">還沒有抽籤紀錄</div>';return}[...state.history].reverse().forEach((x,ri)=>{const index=state.history.length-1-ri;const row=document.createElement('div');row.className='history-item';const main=x.type==='singer'?x.singer:x.song;const sub=x.type==='singer'?'歌手':`${x.singer}・歌曲`;row.innerHTML=`<div><strong>${escapeHtml(main)}</strong><small>${escapeHtml(sub)}</small></div><button class="remove" data-i="${index}">刪除</button>`;box.appendChild(row)});box.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{state.history.splice(Number(b.dataset.i),1);saveHistory()})}
+
+    $('drawBtn').addEventListener('click',draw);
+    $('knob').addEventListener('click',draw);
+    $('clearBtn').addEventListener('click',()=>{state.history=[];saveHistory();toast('紀錄已清除')});
+    renderHistory();loadData();
+  </script>
+</body>
+</html>
